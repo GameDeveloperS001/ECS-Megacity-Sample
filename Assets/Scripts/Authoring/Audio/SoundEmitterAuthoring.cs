@@ -19,12 +19,13 @@ namespace Unity.MegaCity.Audio
         public UnityObjectRef<SoundEmitterAuthoring> Authoring;
     }
 
-    [BakingVersion("Abdul", 1)]
+    [BakingVersion("Julian", 2)]
     public class SoundEmitterBaker: Baker<SoundEmitterAuthoring>
     {
         public override void Bake(SoundEmitterAuthoring authoring)
         {
-            AddComponent(new SoundEmitterBakingData { Authoring = authoring });
+            var entity = GetEntity(authoring.gameObject, TransformUsageFlags.Dynamic);
+            AddComponent(entity, new SoundEmitterBakingData { Authoring = authoring });
         }
     }
 
