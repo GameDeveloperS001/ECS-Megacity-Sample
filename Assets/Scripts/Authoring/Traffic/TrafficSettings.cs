@@ -19,15 +19,15 @@ namespace Unity.MegaCity.Traffic
         public List<GameObject> vehiclePrefabs;
     }
 
-    [BakingVersion("Abdul", 1)]
+    [BakingVersion("Julian", 2)]
     public class TrafficSettingsBaker : Baker<TrafficSettings>{
         public override void Bake(TrafficSettings authoring)
         {
             for (int j = 0; j < authoring.vehiclePrefabs.Count; j++)
             {
                 // A primary entity needs to be called before additional entities can be used
-                Entity vehiclePrefab = CreateAdditionalEntity();
-                var prefabEntity = GetEntity(authoring.vehiclePrefabs[j]);
+                Entity vehiclePrefab = CreateAdditionalEntity(TransformUsageFlags.Dynamic | TransformUsageFlags.Renderable | TransformUsageFlags.WorldSpace);
+                var prefabEntity = GetEntity(authoring.vehiclePrefabs[j], TransformUsageFlags.Dynamic);
                 var prefabData = new VehiclePrefabData
                 {
                     VehiclePrefab = prefabEntity,
@@ -43,8 +43,8 @@ namespace Unity.MegaCity.Traffic
                 MaxCars = authoring.maxCars,
                 PoolCellVehicleSize = authoring.poolVehicleCellSize
             };
-
-            AddComponent(trafficSettings);
+            var entityData = GetEntity(authoring.gameObject, TransformUsageFlags.Dynamic);
+            AddComponent(entityData, trafficSettings);
         }
     }
 }
