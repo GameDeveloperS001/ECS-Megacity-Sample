@@ -13,38 +13,37 @@ namespace Unity.MegaCity.Traffic
         public float globalSpeedFactor = 1.0f;
         public int maxCars = 2000;
         public int poolVehicleCellSize = 30000;
-
         public float[] speedMultipliers;
-
         public List<GameObject> vehiclePrefabs;
-    }
 
-    [BakingVersion("Julian", 2)]
-    public class TrafficSettingsBaker : Baker<TrafficSettings>{
-        public override void Bake(TrafficSettings authoring)
+        [BakingVersion("Julian", 2)]
+        public class TrafficSettingsBaker : Baker<TrafficSettings>
         {
-            for (int j = 0; j < authoring.vehiclePrefabs.Count; j++)
+            public override void Bake(TrafficSettings authoring)
             {
-                // A primary entity needs to be called before additional entities can be used
-                Entity vehiclePrefab = CreateAdditionalEntity(TransformUsageFlags.Dynamic | TransformUsageFlags.Renderable | TransformUsageFlags.WorldSpace);
-                var prefabEntity = GetEntity(authoring.vehiclePrefabs[j], TransformUsageFlags.Dynamic);
-                var prefabData = new VehiclePrefabData
+                for (int j = 0; j < authoring.vehiclePrefabs.Count; j++)
                 {
-                    VehiclePrefab = prefabEntity,
-                    VehicleSpeed = j < authoring.speedMultipliers.Length ? authoring.speedMultipliers[j] : 3.0f
-                };
+                    // A primary entity needs to be called before additional entities can be used
+                    Entity vehiclePrefab = CreateAdditionalEntity(TransformUsageFlags.Dynamic);
+                    var prefabEntity = GetEntity(authoring.vehiclePrefabs[j], TransformUsageFlags.Dynamic);
+                    var prefabData = new VehiclePrefabData
+                    {
+                        VehiclePrefab = prefabEntity,
+                        VehicleSpeed = j < authoring.speedMultipliers.Length ? authoring.speedMultipliers[j] : 3.0f
+                    };
 
-                AddComponent(vehiclePrefab, prefabData);
+                    AddComponent(vehiclePrefab, prefabData);
+                }
+                var trafficSettings = new TrafficSettingsData
+                {
+                    GlobalSpeedFactor = authoring.globalSpeedFactor,
+                    PathSegments = authoring.pathSegments,
+                    MaxCars = authoring.maxCars,
+                    PoolCellVehicleSize = authoring.poolVehicleCellSize
+                };
+                var entityData = GetEntity(authoring.gameObject, TransformUsageFlags.Dynamic);
+                AddComponent(entityData, trafficSettings);
             }
-            var trafficSettings = new TrafficSettingsData
-            {
-                GlobalSpeedFactor = authoring.globalSpeedFactor,
-                PathSegments = authoring.pathSegments,
-                MaxCars = authoring.maxCars,
-                PoolCellVehicleSize = authoring.poolVehicleCellSize
-            };
-            var entityData = GetEntity(authoring.gameObject, TransformUsageFlags.Dynamic);
-            AddComponent(entityData, trafficSettings);
         }
     }
 }
